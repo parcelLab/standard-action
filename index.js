@@ -14,6 +14,8 @@ const {
 
 const CHECK_NAME = 'Standard'
 
+console.log('starting with correct version')
+
 main().catch((err) => {
   actions.setFailed(err.message)
   process.exit(1)
@@ -155,7 +157,7 @@ in your action config.`)
 
   const linter = loadLinter(linterName)
   
-  console.log('changed files:'
+  console.log('changed files:')
   console.log(changedFiles, files)
 
   const lintFiles = promisify(linter.lintFiles.bind(linter))
