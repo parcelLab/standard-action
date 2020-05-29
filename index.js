@@ -1,7 +1,7 @@
 const fetch = require('node-fetch')
 const { promisify } = require('util')
 const { CLIEngine } = require('eslint')
-const actions = require('@actions/core')
+const core = require('@actions/core')
 const github = require('@actions/github')
 const resolve = require('resolve')
 
@@ -17,7 +17,7 @@ const CHECK_NAME = 'Standard'
 console.log('starting with correct version')
 
 main().catch((err) => {
-  actions.setFailed(err.message)
+  core.setFailed(err.message)
   process.exit(1)
 })
 
@@ -139,13 +139,13 @@ function loadLinter (name) {
 }
 
 async function main () {
-  const formatStyle = actions.getInput('formatter')
-  const linterName = actions.getInput('linter')
-  const useAnnotations = actions.getInput('annotate')
+  const formatStyle = core.getInput('formatter')
+  const linterName = core.getInput('linter')
+  const useAnnotations = core.getInput('annotate')
   const client = new github.GitHub(process.env.GITHUB_TOKEN)
   const prNumber = getPrNumber()
   const changedFiles = await getChangedFiles(client, prNumber)
-  const files = actions.getInput('files')
+  const files = core.getInput('files')
   if (useAnnotations === 'true' && !process.env.GITHUB_TOKEN) {
     throw new Error(`when using annotate: true, you must set
 
@@ -172,12 +172,12 @@ in your action config.`)
       await publishResults(results)
     } catch (err) {
       console.error(err)
-      actions.setFailed(err.message)
+      core.setFailed(err.message)
     }
   }
 
   if (results.errorCount > 0) {
-    actions.setFailed(`${results.errorCount} error(s), ${results.warningCount} warning(s) found`)
+    core.setFailed(`${results.errorCount} error(s), ${results.warningCount} warning(s) found`)
     process.exit(1)
   }
 }
