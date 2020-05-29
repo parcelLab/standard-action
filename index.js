@@ -2,6 +2,7 @@ const fetch = require('node-fetch')
 const { promisify } = require('util')
 const { CLIEngine } = require('eslint')
 const actions = require('@actions/core')
+const github = require('@actions/github')
 const resolve = require('resolve')
 
 const {
@@ -80,6 +81,35 @@ function printResults (results, formatStyle) {
   console.log(formatter(results.results, {}))
 }
 
+function getPrNumber() {
+  const pullRequest = github.context.payload.pull_request;
+  if (!pullRequest) {
+    return undefined;
+  }
+
+  return pullRequest.number;
+}
+
+async function getChangedFiles(
+  client,
+  prNumber
+) {
+  const listFilesResponse = await client.pulls.listFiles({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    pull_number: prNumber
+  });
+
+  const changedFiles = listFilesResponse.data.map(f => f.filename);
+
+  core.debug('found changed files:');
+  for (const file of changedFiles) {
+    core.debug('  ' + file);
+  }
+
+  return changedFiles;
+}
+
 function loadLinter (name) {
   let linterPath
   try {
@@ -110,6 +140,9 @@ async function main () {
   const formatStyle = actions.getInput('formatter')
   const linterName = actions.getInput('linter')
   const useAnnotations = actions.getInput('annotate')
+  const client = new github.GitHub(process.env.GITHUB_TOKEN)
+  const prNumber = getPrNumber()
+  const changedFiles = getChangedFiles(client, prNumber)
   const files = actions.getInput('files')
   if (useAnnotations === 'true' && !process.env.GITHUB_TOKEN) {
     throw new Error(`when using annotate: true, you must set
