@@ -161,7 +161,7 @@ in your action config.`)
   console.log('argument files', files)
 
   const lintFiles = promisify(linter.lintFiles.bind(linter))
-  const results = await lintFiles(files || [], {
+  const results = await lintFiles(changedFiles || [], {
     cwd: GITHUB_WORKSPACE
   })
 
