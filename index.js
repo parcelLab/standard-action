@@ -14,8 +14,6 @@ const {
 
 const CHECK_NAME = 'Standard'
 
-console.log('starting with correct version')
-
 main().catch((err) => {
   core.setFailed(err.message)
   process.exit(1)
@@ -145,7 +143,6 @@ async function main () {
   const client = new github.GitHub(process.env.GITHUB_TOKEN)
   const prNumber = getPrNumber()
   const changedFiles = await getChangedFiles(client, prNumber)
-  const files = core.getInput('files')
   if (useAnnotations === 'true' && !process.env.GITHUB_TOKEN) {
     throw new Error(`when using annotate: true, you must set
 
@@ -156,9 +153,6 @@ in your action config.`)
   }
 
   const linter = loadLinter(linterName)
-
-  console.log('changed files:', changedFiles)
-  console.log('argument files', files)
 
   const lintFiles = promisify(linter.lintFiles.bind(linter))
   const results = await lintFiles(changedFiles || [], {
