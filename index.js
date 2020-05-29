@@ -83,16 +83,16 @@ function printResults (results, formatStyle) {
   console.log(formatter(results.results, {}))
 }
 
-function getPrNumber() {
-  const pullRequest = github.context.payload.pull_request;
+function getPrNumber () {
+  const pullRequest = github.context.payload.pull_request
   if (!pullRequest) {
-    return undefined;
+    return undefined
   }
 
-  return pullRequest.number;
+  return pullRequest.number
 }
 
-async function getChangedFiles(
+async function getChangedFiles (
   client,
   prNumber
 ) {
@@ -100,16 +100,16 @@ async function getChangedFiles(
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     pull_number: prNumber
-  });
+  })
 
-  const changedFiles = listFilesResponse.data.map(f => f.filename);
+  const changedFiles = listFilesResponse.data.map(f => f.filename)
 
-  core.debug('found changed files:');
+  core.debug('found changed files:')
   for (const file of changedFiles) {
-    core.debug('  ' + file);
+    core.debug('  ' + file)
   }
 
-  return changedFiles;
+  return changedFiles
 }
 
 function loadLinter (name) {
@@ -144,7 +144,7 @@ async function main () {
   const useAnnotations = actions.getInput('annotate')
   const client = new github.GitHub(process.env.GITHUB_TOKEN)
   const prNumber = getPrNumber()
-  const changedFiles = getChangedFiles(client, prNumber)
+  const changedFiles = await getChangedFiles(client, prNumber)
   const files = actions.getInput('files')
   if (useAnnotations === 'true' && !process.env.GITHUB_TOKEN) {
     throw new Error(`when using annotate: true, you must set
@@ -156,9 +156,9 @@ in your action config.`)
   }
 
   const linter = loadLinter(linterName)
-  
-  console.log('changed files:')
-  console.log(changedFiles, files)
+
+  console.log('changed files:', changedFiles)
+  console.log('argument files', files)
 
   const lintFiles = promisify(linter.lintFiles.bind(linter))
   const results = await lintFiles(files || [], {
