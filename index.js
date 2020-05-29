@@ -154,6 +154,9 @@ in your action config.`)
   }
 
   const linter = loadLinter(linterName)
+  
+  console.log('changed files:'
+  console.log(changedFiles, files)
 
   const lintFiles = promisify(linter.lintFiles.bind(linter))
   const results = await lintFiles(files || [], {
