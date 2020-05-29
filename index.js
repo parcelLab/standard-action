@@ -100,7 +100,7 @@ async function getChangedFiles (
     pull_number: prNumber
   })
 
-  const changedFiles = listFilesResponse.data.map(f => f.filename)
+  const changedFiles = listFilesResponse.data.map(f => f.filename).filter(filename => filename.endsWith('.js'))
 
   core.debug('found changed files:')
   for (const file of changedFiles) {
