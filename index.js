@@ -139,7 +139,9 @@ async function main () {
   const client = new github.GitHub(process.env.GITHUB_TOKEN)
   const prNumber = getPrNumber()
   const changedFiles = await getChangedFiles(client, prNumber)
+  console.log('changedFiles', changedFiles)
   if (changedFiles === []) {
+    console.log('no .js files were changed, exiting successfully')
     process.exit(0)
   }
   if (useAnnotations === 'true' && !process.env.GITHUB_TOKEN) {
