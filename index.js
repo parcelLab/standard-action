@@ -140,7 +140,7 @@ async function main () {
   const prNumber = getPrNumber()
   const changedFiles = await getChangedFiles(client, prNumber)
   console.log('changedFiles', changedFiles)
-  if (changedFiles === []) {
+  if (changedFiles.length === 0) {
     console.log('no .js files were changed, exiting successfully')
     process.exit(0)
   }
