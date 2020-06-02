@@ -100,14 +100,12 @@ async function getChangedFiles (
     pull_number: prNumber
   })
 
-  const changedFiles = listFilesResponse.data.map(f => f.filename).filter(filename => filename.endsWith('.js'))
+  const changedFiles = listFilesResponse.data.map(f => f.filename)           
+  const changedJsFiles = changedFiles.filter(filename => filename.endsWith('.js'))
 
-  core.debug('found changed files:')
-  for (const file of changedFiles) {
-    core.debug('  ' + file)
-  }
-
-  return changedFiles
+  console.log('changedFiles', changedFiles)
+  console.log('changedJsFiles', changedJsFiles)
+  return changedJsFiles
 }
 
 function loadLinter (name) {
