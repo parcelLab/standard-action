@@ -102,9 +102,7 @@ async function getChangedFiles (
 
   const changedFiles = listFilesResponse.data.map(f => f.filename)           
   const changedJsFiles = changedFiles.filter(filename => filename.endsWith('.js'))
-
-  console.log('changedFiles', changedFiles)
-  console.log('changedJsFiles', changedJsFiles)
+  
   return changedJsFiles
 }
 
@@ -141,6 +139,9 @@ async function main () {
   const client = new github.GitHub(process.env.GITHUB_TOKEN)
   const prNumber = getPrNumber()
   const changedFiles = await getChangedFiles(client, prNumber)
+  if (changedFiles === []) {
+    process.exit(0)
+  }
   if (useAnnotations === 'true' && !process.env.GITHUB_TOKEN) {
     throw new Error(`when using annotate: true, you must set
 
@@ -153,7 +154,7 @@ in your action config.`)
   const linter = loadLinter(linterName)
 
   const lintFiles = promisify(linter.lintFiles.bind(linter))
-  const results = await lintFiles(changedFiles || [], {
+  const results = await lintFiles(changedFiles, {
     cwd: GITHUB_WORKSPACE
   })
 
